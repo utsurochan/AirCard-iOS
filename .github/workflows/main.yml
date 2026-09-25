@@ -19,10 +19,16 @@ jobs:
 
       - name: Build app
         run: |
-          xcodebuild -project AirCard.xcodeproj -scheme AirCard -sdk iphoneos -configuration Release archive -archivePath build/AirCard.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+          # Автоматически находим .xcodeproj или .xcworkspace
+          PROJECT_FILE=$(ls -d *.xcodeproj | head -n 1)
+          SCHEME_NAME=$(basename "$PROJECT_FILE" .xcodeproj)
+          
+          echo "Building project: $PROJECT_FILE with scheme: $SCHEME_NAME"
+          
+          xcodebuild -project "$PROJECT_FILE" -scheme "$SCHEME_NAME" -sdk iphoneos -configuration Release archive -archivePath build/App.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
           
           mkdir -p Payload
-          mv build/AirCard.xcarchive/Products/Applications/AirCard.app Payload/
+          mv build/App.xcarchive/Products/Applications/*.app Payload/
           zip -r AirCard.ipa Payload
           rm -rf Payload build
 
